@@ -139,3 +139,15 @@ def is_student(user):
     """Return True if the user has a StudentProfile."""
     return hasattr(user, 'student_profile')
 
+def getUploadsForCourse(course):
+    ret = []
+    if Course.objects.filter(name = course).exists():
+        mycourse = Course.objects.filter(name=course)[0]
+        for upload in QRCodeUpload.objects.filter(lecture__course = course):
+            weekday = upload.uploaded_at.date.weekday()
+            if((weekday == 0 and mycourse.day_mon) or (weekday == 1 and mycourse.day_tue) or (weekday == 2 and mycourse.day_wed) or (weekday == 3 and mycourse.day_thu) or (weekday == 4 and mycourse.day_fri)):
+                time = upload.uploaded_at.time
+                if (time < mycourse.end_time and time > mycourse.start_time):
+                    ret.append(upload)
+    return ret
+    
