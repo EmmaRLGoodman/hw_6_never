@@ -226,4 +226,16 @@ def dumpUploads(request):
              'upload_time': str(u.uploaded_at)} for u in uploads]
     return JsonResponse(data, safe=False)
 
-
+@csrf_exempt
+def getUploads(request):
+    if not request.user.is_authenticated or not is_instructor(request.user):
+        return HttpResponse("Unauthorized", status=401)
+    try:
+        course = request.GET(['course'])
+    except (KeyError, ValueError):
+        return JsonResponse({"error": "Missing course parameter"}, status=400)
+    uploads = models.getUploadsForCourse(course)
+    ret = []
+    for upload in uploads:
+        ret.append({"username":upload.student.username, "upload_time": str(upload.uploaded_at)})
+    return JsonResponse(ret, safe=False)
