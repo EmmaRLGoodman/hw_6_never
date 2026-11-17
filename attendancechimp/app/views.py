@@ -17,7 +17,7 @@ import json
 import io
 
 from .models import (InstructorProfile, StudentProfile, Course, Enrollment,
-                     Lecture, QRCodeUpload, is_instructor, is_student)
+                     Lecture, QRCodeUpload, is_instructor, is_student, getUploadsForCourse)
 
 CDT = zoneinfo.ZoneInfo("America/Chicago")
 
@@ -234,7 +234,7 @@ def getUploads(request):
         course = request.GET['course']
     except (KeyError, ValueError):
         return JsonResponse({"error": "Missing course parameter"}, status=400)
-    uploads = models.getUploadsForCourse(course)
+    uploads = getUploadsForCourse(course)
     ret = []
     for upload in uploads:
         ret.append({"username":upload.student.username, "upload_time": str(upload.uploaded_at)})
